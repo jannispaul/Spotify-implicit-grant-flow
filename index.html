@@ -17,14 +17,12 @@
     <div class="favorites">
         <h1>Your Spotify Top 20</h1>
         <div class="container">
-
         </div>
     </div>
 
     <script>
         let clientId = "9291a0308b724f6db566fe41b9205cc5";
-        const authEndPoint = "https://accounts.spotify.com/authorize";
-        const redirectUri = "http://127.0.0.1:5500/index.html";
+        const redirectUri = "https://spotify-implicit-grant-flow.vercel.app";
         let urlParams = new URLSearchParams(window.location.hash.replace("#", "?"));
         let accessToken = urlParams.get("access_token");
         let scope = ["user-top-read"];
@@ -35,7 +33,7 @@
         }
 
         function authorize() {
-            var url = 'https://accounts.spotify.com/authorize';
+            let url = 'https://accounts.spotify.com/authorize';
             url += '?response_type=token';
             url += '&client_id=' + encodeURIComponent(clientId);
             url += '&scope=' + encodeURIComponent(scope);
@@ -44,7 +42,7 @@
         }
 
 
-        // Example POST method implementation:
+        // Fetch JSON from Spotify
         async function fetchJSONFromSpotify(endpoint) {
             let headers = new Headers();
             headers.append("Authorization", "Bearer " + accessToken);
@@ -63,9 +61,11 @@
             }
 
             let json = await response.json();
-            return json; // parses JSON response into native JavaScript objects
+            return json;
         }
 
+
+        // Get favorites 
         function fetchFavorites(type) {
             let endpoint = `https://api.spotify.com/v1/me/top/${type}`
             fetchJSONFromSpotify(endpoint).then(favoritesJSON => favoritesJSON.items.forEach(favorite => {
