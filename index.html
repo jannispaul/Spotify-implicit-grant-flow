@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Tutorial</title>
+    <style>
+        .container {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="favorites">
+        <h1>Your Spotify Top 20</h1>
+        <div class="container">
+
+        </div>
+    </div>
+
+    <script>
+        let clientId = "9291a0308b724f6db566fe41b9205cc5";
+        const authEndPoint = "https://accounts.spotify.com/authorize";
+        const redirectUri = "http://127.0.0.1:5500/index.html";
+        let urlParams = new URLSearchParams(window.location.hash.replace("#", "?"));
+        let accessToken = urlParams.get("access_token");
+        let scope = ["user-top-read"];
+
+
+        if (!accessToken) {
+            document.querySelector("body").insertAdjacentHTML("beforeend", `<button onclick="authorize()">Login with Spotify</button>`);
+        }
+
+        function authorize() {
+            var url = 'https://accounts.spotify.com/authorize';
+            url += '?response_type=token';
+            url += '&client_id=' + encodeURIComponent(clientId);
+            url += '&scope=' + encodeURIComponent(scope);
+            url += '&redirect_uri=' + encodeURIComponent(redirectUri);
+            window.location = url;
+        }
+
+
+        // Example POST method implementation:
+        async function fetchJSONFromSpotify(endpoint) {
+            let headers = new Headers();
+            headers.append("Authorization", "Bearer " + accessToken);
+
+            let requestOptions = {
+                method: "GET",
+                headers: headers,
+                redirect: "follow"
+            }
+
+            const response = await fetch(endpoint, requestOptions);
+
+            if (!response.ok) {
+                const message = `An error has occured: ${response.status}`;
+                throw new Error(message);
+            }
+
+            let json = await response.json();
+            return json; // parses JSON response into native JavaScript objects
+        }
+
+        function fetchFavorites(type) {
+            let endpoint = `https://api.spotify.com/v1/me/top/${type}`
+            fetchJSONFromSpotify(endpoint).then(favoritesJSON => favoritesJSON.items.forEach(favorite => {
+                var p = document.createElement("p");
+                document.querySelector("." + type).appendChild(p).innerHTML = favorite.name;
+
+                if (favorite.preview_url) {
+                    let sound = document.createElement("audio");
+                    sound.controls = true,
+                        sound.type = "audio/mpeg";
+                    sound.src = favorite.preview_url;
+                    document.querySelector("." + type).appendChild(sound);
+                }
+            }))
+        }
+
+        if (accessToken) {
+            document.querySelector(".container").insertAdjacentHTML("beforeend", `<div class="artists"><h2>Artists</h2></div><div class="tracks"><h2>Tracks</h2></div>`);
+
+            fetchFavorites("artists");
+            fetchFavorites("tracks");
+        }
+
+    </script>
+</body>
+
+</html>
