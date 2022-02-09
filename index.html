@@ -21,8 +21,8 @@
     </div>
 
     <script>
-        let clientId = "9291a0308b724f6db566fe41b9205cc5";
-        const redirectUri = "https://spotify-implicit-grant-flow.vercel.app";
+        let clientId = "9291a0308b724f6db566fe41b9205cc5"; // Change this to your apps clientID
+        const redirectUri = "https://spotify-implicit-grant-flow.vercel.app"; // Change this to your URI
         let urlParams = new URLSearchParams(window.location.hash.replace("#", "?"));
         let accessToken = urlParams.get("access_token");
         let scope = ["user-top-read"];
